@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PC Hardware Assembly & Disassembly Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <script type="module" crossorigin src="/assets/index-DZcUMWyA.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-cJ5KmJNt.css">
+</head>
+
+<body>
+  <div id="app">
+    <!-- WebGL Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- Loading Screen Overlay -->
+    <div id="loading-screen" class="active">
+      <div class="loader-content">
+        <div class="loader-logo">
+          <span class="logo-badge">3D WORKSTATION</span>
+        </div>
+        <h1 class="loader-title">PC Hardware Simulator</h1>
+        <p class="loader-sub">Loading photorealistic components (96.8 MB)...</p>
+
+        <div class="progress-bar-container">
+          <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+        </div>
+        <div id="progress-text" class="progress-text">0%</div>
+
+        <div class="loader-tip">
+          <span class="tip-label">TIP:</span>
+          <span id="loader-tip-text">Inspect CPU, RAM, and Motherboard in 360° 3D with interactive guided
+            assembly.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Navigation & Stage Header -->
+    <header id="top-bar">
+      <div class="brand">
+        <span class="brand-badge">SIMULATOR</span>
+        <span class="brand-title">PC Assembly & Disassembly</span>
+      </div>
+
+      <div class="stage-indicator">
+        <span class="stage-label">MODE:</span>
+        <span id="current-mode-badge" class="mode-badge explore">1. EXPLORE & LEARN</span>
+      </div>
+
+      <div class="top-actions">
+        <button id="btn-toggle-info" class="icon-btn active-accent" title="Toggle Hardware Specifications & Guide">Hardware Info</button>
+        <button id="btn-sound-toggle" class="icon-btn" title="Toggle Sound">🔊</button>
+        <button id="btn-reset-view" class="icon-btn" title="Reset Camera View">Reset View</button>
+      </div>
+    </header>
+
+    <!-- Guided Instructions Banner (Center Top) -->
+    <div id="instruction-banner" class="instruction-banner">
+      <div class="banner-icon" id="banner-icon">🔍</div>
+      <div class="banner-content">
+        <div class="banner-step" id="banner-step">EXPLORATION MODE</div>
+        <div class="banner-text" id="banner-text">Click any component to inspect specifications, architecture, and handling guides.</div>
+      </div>
+    </div>
+
+    <!-- Snap Hologram Feedback Indicator -->
+    <div id="snap-feedback" class="snap-feedback hidden">
+      <span class="snap-icon">🎯</span>
+      <span id="snap-feedback-text">In Snap Zone! Release to seat component.</span>
+    </div>
+
+    <!-- Component Information Drawer (Right Side) -->
+    <aside id="info-drawer" class="info-drawer open">
+      <div class="drawer-header">
+        <div class="drawer-title-group">
+          <span id="info-icon" class="info-icon">🖥️</span>
+          <div>
+            <h3 id="info-title">Motherboard (Asus Z170-P)</h3>
+            <span id="info-category" class="info-category">Mainboard / System Spine</span>
+          </div>
+        </div>
+        <div class="drawer-header-actions">
+          <button id="btn-drawer-focus" class="drawer-action-btn" title="Focus Camera on this Component">Focus</button>
+          <button id="btn-close-drawer" class="drawer-close-btn" title="Close Drawer">✕</button>
+        </div>
+      </div>
+
+      <div class="drawer-body">
+        <p id="info-subtitle" class="info-subtitle">The primary printed circuit board uniting all system hardware.</p>
+
+        <div class="spec-grid" id="info-specs">
+          <!-- Dynamic specs injected here -->
+        </div>
+
+        <div class="section-title">Description & Architecture</div>
+        <p id="info-description" class="info-description"></p>
+
+        <div class="section-title">Installation & Handling Guide</div>
+        <ol id="info-guide" class="info-guide"></ol>
+
+        <div class="warning-box" id="info-warning"></div>
+      </div>
+    </aside>
+
+    <!-- Bottom Controls & Game Actions Bar -->
+    <footer id="bottom-bar">
+      <div class="control-group left">
+        <button id="btn-mode-explore" class="action-btn active" type="button">
+          <span class="btn-icon">🔍</span>
+          <span>Explore Mode</span>
+        </button>
+        <button id="btn-action-disassemble" class="action-btn" type="button">
+          <span class="btn-icon">⚙️</span>
+          <span>Disassemble</span>
+        </button>
+        <button id="btn-action-play" class="action-btn primary" type="button">
+          <span class="btn-icon">▶</span>
+          <span>Run Assembly</span>
+        </button>
+      </div>
+
+      <div class="assembly-progress-group" id="assembly-progress-group">
+        <span class="progress-label">Installed:</span>
+        <div class="slot-dots">
+          <span class="dot installed" id="dot-cpu" title="CPU">CPU</span>
+          <span class="dot installed" id="dot-ram1" title="RAM Slot 1">RAM 1</span>
+          <span class="dot installed" id="dot-ram2" title="RAM Slot 2">RAM 2</span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- POST Success Modal -->
+    <div id="post-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-badge-success">POST PASSED ✓</div>
+        <h2>System Assembly Successful!</h2>
+        <p>All core hardware components are properly seated and aligned. System bus communications verified.</p>
+
+        <div class="post-specs-summary">
+          <div class="post-item">
+            <span class="post-check">✔</span>
+            <span>CPU: LGA1151 Processor seated in zero-insertion socket</span>
+          </div>
+          <div class="post-item">
+            <span class="post-check">✔</span>
+            <span>Memory: Dual-Channel DDR4 128-bit bus active</span>
+          </div>
+          <div class="post-item">
+            <span class="post-check">✔</span>
+            <span>Motherboard: Power Delivery & Interconnects Online</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button id="btn-modal-inspect" class="action-btn">Inspect Assembled PC</button>
+          <button id="btn-modal-disassemble" class="action-btn primary">Disassemble Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
